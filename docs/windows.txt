@@ -1,0 +1,71 @@
+LOCAL MEETING NOTES — Windows x64, version 1.1
+
+GET STARTED
+1. Open LocalMeetingNotes.exe. The local engine and smaller speech model are already included.
+2. Choose System audio to match the headset/speakers used by Teams, Zoom or your browser.
+3. Choose your Microphone, or choose Off for system audio only.
+4. Choose German or English.
+5. Click Start recording. Check that the level meters respond while people speak.
+6. Click Stop and transcribe. Keep the app open while the local model works.
+7. Review the transcript, then choose whether to keep the audio or click Delete audio.
+
+Nothing is uploaded. No account, API key, subscription or internet connection is required for recording or transcription. The application contains no network client. Setup.ps1 is separate and only downloads public engine/model files if needed; it never accesses meeting recordings.
+
+Use headphones to avoid recording loudspeaker playback again through your microphone. System capture includes all sounds on the chosen output, including notifications. If your meeting changes output devices, stop and start a new recording with the new device. Device changes are not followed automatically.
+
+LONG MEETINGS AND RECOVERY
+Two-hour meetings fit within the recording format. Recording writes to disk continuously, rather than keeping the meeting in memory until Stop. Every five seconds, the app updates the WAV headers and requests a durable disk flush. On normal Stop, the remaining audio is finalized before transcription begins.
+
+The app requests that Windows stay awake during recording and transcription. This does not prevent forced sleep, closing a laptop lid, a device disconnect, running out of battery or power loss.
+
+The app requires at least 1 GB of free disk space before recording. It checks space every five seconds and stops recording if space is running low, reserving room for any unwritten silence, combined audio and a safety margin. It also stops after eight hours to keep file sizes and processing bounded. Other applications can still fill the disk between checks.
+
+If transcription fails or is cancelled, the audio is kept. If the app exits unexpectedly, reopen it and choose Recover recording. Select the meeting folder containing system.wav and, if enabled, microphone.wav. The app copies the tracks into a new meeting folder, repairs stale WAV headers in those copies, combines the tracks and transcribes. Original recordings are not modified. A currently active recording cannot be recovered while it is still being written.
+
+No software can guarantee zero loss after every crash or hardware failure. The latest uncheckpointed audio (normally up to about five seconds), and anything not recorded while the computer was asleep or a device was disconnected, may be unavailable. Corrupted storage can cause greater loss. Keep the computer powered during long meetings.
+
+STORAGE AND OPTIONAL DELETION
+The Meetings folder beside the executable contains one folder for each recording/import.
+- system.wav: system audio, 16 kHz mono PCM.
+- microphone.wav: microphone audio, if enabled.
+- meeting.wav: combined audio used for transcription.
+- transcript.txt: plain text.
+- transcript.srt: text with approximate timestamps.
+- transcription.log: local engine output, which can include transcript text.
+- meeting-info.txt: recording settings.
+- recording.inprogress / recording.saved: recording status.
+- transcription.complete: marks a fully saved transcript.
+
+With microphone capture enabled, a two-hour meeting uses about 690 MB of audio across the three WAV files, until you choose to delete them. The model is separate and occupies about 190 MB.
+
+Audio is kept by default. Delete audio is enabled only after a complete nonempty transcript and subtitle file have been saved. Review them first. Clicking Delete audio asks for confirmation, then permanently removes system.wav, microphone.wav and meeting.wav from the CURRENT meeting folder. The transcript, subtitles, logs and other files stay. This deletion cannot be undone and is not secure disk erasure; external backups are unaffected.
+
+Imported original files outside the current meeting folder are never deleted. Recovery also preserves its original interrupted recording folder, so deleting the recovered copy's audio does not delete the original tracks. Existing meeting folders from version 1.0 are kept; no older recordings are automatically removed.
+
+RETRY / IMPORT
+Transcribe a WAV accepts a local mono/stereo PCM or floating-point WAV. It creates a new meeting folder and converts the file locally. For a recording interrupted by an app crash or audio device failure, use Recover recording so source tracks can be combined and stale headers repaired.
+
+MODEL
+Only German and English appear in the language menu. Both use the same multilingual Whisper small model. The Q5_1 quantized version reduces the model from approximately 488 MB to 190 MB. Quantization can slightly affect accuracy; the reference speech check passed, but that is not a guarantee for every meeting. Choose model still permits another compatible whisper.cpp GGML .bin model if you prefer.
+
+This version runs on the CPU. Transcription time depends on hardware and meeting length. It does not identify speakers by name, create summaries or record video. Transcripts can contain errors. The text shown in the app is a read-only copy of the saved subtitle file.
+
+SETUP / REBUILD
+Keep the complete app folder together, in a writable local location.
+Windows x64 and the .NET 8 Desktop Runtime are required; the runtime is already installed on this computer. No compiler is required to run the app.
+Runtime: https://dotnet.microsoft.com/en-us/download/dotnet/8.0
+Setup.ps1 restores missing public engine/model files using pinned SHA-256 checks.
+Rebuild.ps1 rebuilds the included Source using the .NET SDK and locked NuGet dependencies. Close the app first. The initial dependency restore needs internet access.
+
+COMPONENTS
+whisper.cpp 1.9.5, official b5454 Windows x64 CPU build:
+https://github.com/ggml-org/whisper.cpp/releases/tag/b5454
+Whisper small Q5_1 model from the whisper.cpp model repository:
+https://huggingface.co/ggerganov/whisper.cpp
+NAudio.Core and NAudio.Wasapi 2.2.1:
+https://github.com/naudio/NAudio
+Third-party MIT license texts are in Licenses.
+
+VERIFICATION
+The source includes tests for timestamp alignment, silence and overlapping packets, a readable checkpoint while recording is still open, recovery after a child process exits without WAV cleanup, keeping original recordings unchanged, refusing deletion without completed transcripts, and keeping transcripts during audio cleanup. A generated two-hour pair of audio tracks was mixed and checked for exact duration and speech preserved at the end. This is an accelerated file-handling test, not two hours of real-time recording or transcription.
+The quantized model was checked against reference speech locally. A reference sample was also captured through Windows system loopback before transcription. Test fixtures are kept separate from user meeting folders.

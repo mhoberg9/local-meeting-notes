@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <AssemblyName>LocalMeetingNotes</AssemblyName>
+    <Version>1.1.0</Version>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile><UseSharedCompilation>false</UseSharedCompilation>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NAudio.Core" Version="2.2.1" />
+    <PackageReference Include="NAudio.Wasapi" Version="2.2.1" />
+
+  </ItemGroup>
+  <PropertyGroup Condition="'$(PortablePackage)' == 'true'">
+    <DefineConstants>$(DefineConstants);PORTABLE_PACKAGE</DefineConstants>
+    <SelfContained>true</SelfContained>
+    <RuntimeFrameworkVersion>8.0.33</RuntimeFrameworkVersion>
+    <PublishSingleFile>true</PublishSingleFile>
+    <NuGetLockFilePath>$(MSBuildProjectDirectory)/packages.portable.lock.json</NuGetLockFilePath>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(PortablePackage)' == 'true'">
+    <EmbeddedResource Include="$(OfflinePayloadPath)" LogicalName="LocalMeetingNotes.OfflinePayload.zip" />
+  </ItemGroup>
+</Project>
+
+
+
+
+

@@ -1,0 +1,49 @@
+# Build and dependency outputs
+**/bin/
+**/obj/
+**/.build/
+build/
+dist/
+.cache/
+**/Models/
+**/models/
+**/Vendor/
+**/vendor/
+**/COMPONENT-SHA256.txt
+**/LocalMeetingNotes-data/
+
+# Meeting content must never enter Git
+**/Meetings/
+*.wav
+*.mp3
+*.m4a
+*.flac
+*.ogg
+*.srt
+*.vtt
+**/transcript*.txt
+**/transcription.log
+**/meeting-info.txt
+**/recording.inprogress
+**/recording.saved
+**/transcription.complete
+**/self-test-error.txt
+
+# Packaged applications belong in Releases
+*.exe
+*.dll
+*.bin
+*.zip
+*.dmg
+*.app/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.pem
+.DS_Store
+.vs/
+.idea/

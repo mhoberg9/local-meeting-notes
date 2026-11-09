@@ -1,0 +1,33 @@
+name: Apple Silicon Mac build
+on:
+  push:
+    branches: [main]
+    paths: ['macos/**', '.github/workflows/macos.yml']
+  pull_request:
+    paths: ['macos/**', '.github/workflows/macos.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: macos-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Compile, sign and check the Apple Silicon app
+        run: bash macos/Build.command --long-tests
+      - name: Publish a compiled private preview package
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          tag="macos-preview-${GITHUB_SHA:0:7}"
+          gh release create "$tag" macos/dist/LocalMeetingNotes-macOS-AppleSilicon.zip --target "$GITHUB_SHA" --prerelease --title 'Apple Silicon Mac preview' --notes-file docs/macos-release.md

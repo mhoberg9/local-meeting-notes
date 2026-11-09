@@ -1,0 +1,11 @@
+* text=auto
+*.cs text eol=lf
+*.csproj text eol=lf
+*.swift text eol=lf
+*.cpp text eol=lf
+*.ps1 text eol=lf
+*.command text eol=lf
+*.sh text eol=lf
+*.yml text eol=lf
+*.md text eol=lf
+*.plist text eol=lf

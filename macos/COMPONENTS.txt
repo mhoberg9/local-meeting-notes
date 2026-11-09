@@ -1,0 +1,14 @@
+PINNED OFFLINE COMPONENTS
+
+Whisper Apple XCFramework source release:
+https://github.com/ggml-org/whisper.cpp/releases/download/b5454/whisper-b5454-xcframework.zip
+Original release archive SHA-256:
+e57f8c48933000acabc13bb913fbe82805d483a2deff692cc6738836bd92393b
+Only its macOS framework is repackaged in Vendor/whisper-macos.zip. Original framework bytes and Unix symlink/executable metadata are preserved. The build selects/thins the Apple Silicon slice and locally re-signs the copied framework.
+
+Multilingual small Q5_1 model:
+https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-small-q5_1.bin
+SHA-256:
+ae85e4a935d7a567bd102fe55afc16bb595bdb618e11b2fc7591bc08120411bb
+
+No Apple SDK or Xcode files are redistributed. Obtain the Mac build tools from Apple on your Mac. The app links the macOS system frameworks provided by the target OS.

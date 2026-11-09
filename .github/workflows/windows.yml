@@ -1,0 +1,39 @@
+name: Windows build
+on:
+  push:
+    branches: [main]
+    paths: ['windows/**', 'scripts/**', '.github/workflows/windows.yml']
+  pull_request:
+    paths: ['windows/**', 'scripts/**', '.github/workflows/windows.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.403'
+      - name: Build and check the portable app
+        shell: pwsh
+        run: ./scripts/Build-Windows.ps1
+      - name: Publish a tested private preview package
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          $tag = 'windows-preview-' + '${{ github.sha }}'.Substring(0, 7)
+          gh release create $tag 'dist/LocalMeetingNotes-Portable-Windows-x64.zip' --target '${{ github.sha }}' --prerelease --title 'Windows portable preview' --notes-file docs/windows-release.md
+          if ($LASTEXITCODE -ne 0) { throw 'Release publication failed' }

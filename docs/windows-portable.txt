@@ -1,0 +1,46 @@
+LOCAL MEETING NOTES — PORTABLE WINDOWS x64
+
+QUICK START
+1. Copy LocalMeetingNotes.exe to a writable folder on the other computer, such as a folder in Documents, or a USB drive.
+2. Double-click it. No administrator access, .NET installation, account or internet connection is needed.
+3. The first launch unpacks the bundled engine, model and license notices into LocalMeetingNotes-data beside the executable. This can take several seconds.
+4. Choose the system output used by your meeting, your microphone, and German or English.
+5. Click Start recording, then Stop and transcribe when finished.
+6. Review the transcript. Delete audio becomes available after a complete transcript has been saved.
+
+The executable includes the Whisper engine, the approximately 190 MB multilingual small Q5_1 model, the Microsoft .NET/Windows Desktop runtime, and the native C++ runtime libraries. There is no separate model download. No meeting recordings or reference audio samples are shipped in this package.
+
+COMPATIBILITY
+Windows 10 version 1903 or newer, or Windows 11, on Intel/AMD 64-bit computers. This is not a macOS, Linux or native Windows ARM package. Transcription uses the CPU and needs no dedicated GPU.
+
+Keep at least 2 GB free as a practical starting point for the executable, extracted components, runtime cache and recording space. Longer meetings need additional space. The app itself requires at least 1 GB free before recording and checks space while recording.
+
+An unsigned development build is provided. Managed company devices may require approval from your IT department according to their application policies.
+
+WHERE YOUR FILES GO
+- LocalMeetingNotes-data/engine: bundled transcription engine and native libraries.
+- LocalMeetingNotes-data/models: bundled speech model.
+- LocalMeetingNotes-data/Licenses: license notices and build details.
+- LocalMeetingNotes-data/Meetings: your saved recordings, transcripts, subtitles and logs.
+
+The .NET host also creates a reusable native-library cache under the Windows temporary folder. Meeting recordings are not saved in that cache. The executable and the data folder need to stay together if you want to move existing meeting recordings to another location. Sharing only the executable or the original ZIP gives someone else a clean app without your recordings.
+
+Nothing is uploaded. Recording and transcription work offline. The portable app does not install shared runtimes, create an account or make system-wide settings changes. If you run it from a USB drive, keep the drive connected until recording and transcription finish.
+
+LONG MEETINGS AND RECOVERY
+Audio is written continuously to disk, with durable checkpoints every five seconds. The app asks Windows to stay awake, checks free space, and stops after eight hours or when space is running low. Closing a laptop lid, forced sleep, power loss and hardware failures can still interrupt recording.
+
+After an interrupted recording, use Recover recording and select the saved meeting folder. Recovery copies and repairs the saved source tracks into a new folder; it does not modify the originals. Cancelled or failed transcription keeps its audio. No app can guarantee zero loss after every failure; recent uncheckpointed audio or damaged storage can still be lost.
+
+A two-hour meeting with both system audio and microphone capture uses approximately 690 MB across the original tracks and combined WAV file. The recording format was checked with generated two-hour audio; this is an accelerated file-handling test, not a claim of two hours of live testing.
+
+AUDIO DELETION
+Audio is retained by default. After successful transcription, Delete audio asks for confirmation and permanently removes system.wav, microphone.wav and meeting.wav from the current meeting folder. Text, subtitles and logs stay. Deletion cannot be undone and is not secure disk erasure. Imported originals and original interrupted-recording folders remain untouched.
+
+MODEL AND TRANSCRIPTS
+German and English are the only language-menu choices. They use the same quantized multilingual model. Accuracy and processing time depend on the recording and hardware. Check important wording in the transcript. The app does not automatically identify speakers by name or create meeting summaries.
+
+If the app's working components are accidentally removed, reopening the executable restores missing bundled components. Keep the Meetings folder if you want to keep your recordings and notes. Native runtime updates require a new portable executable.
+
+VERIFICATION
+The self-contained executable was copied into a fresh folder with spaces and German characters and successfully unpacked its offline components and transcribed reference speech. Recovery, protected audio deletion, and generated two-hour audio handling passed checks. No separate computer or clean virtual machine was used, so device-specific audio settings should be checked with a short recording on each new computer.
