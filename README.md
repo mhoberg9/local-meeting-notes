@@ -17,7 +17,7 @@ Download the platform package from [Releases](../../releases). Build workflows p
 | Platform | Package | Verification |
 | --- | --- | --- |
 | Windows 10/11, Intel/AMD x64 | Portable EXE inside a ZIP; runtime, engine and model bundled | Recording and offline transcription tested locally; CI checks storage/recovery and packaging |
-| macOS 15+, Apple Silicon | Native `.app` inside a ZIP; framework, helper and model bundled | Mac compilation and storage/model checks run in CI; microphone/system-audio permissions and live capture still need a real user-session test |
+| macOS 15+, Apple Silicon | Native `.app` inside a ZIP; framework, helper and model bundled | Compiled and storage/model checks passed on an arm64 Mac runner; live microphone/system-audio capture still needs a user-session test |
 
 Preview builds are unsigned on Windows and ad-hoc signed on Mac. macOS builds are not notarized. A managed device may require its normal IT approval. This repository does not disable system security protections.
 
@@ -43,7 +43,7 @@ The first build fetches verified model/framework files. It runs storage/recovery
 
 Move the app to Applications before first opening it. Grant microphone and **Screen & System Audio Recording** permissions yourself, and make a short test recording of system playback and your voice. No video or screenshots are saved. A successful headless CI build cannot test these permissions or real capture.
 
-See [Mac instructions](macos/Read%20me.txt), [Windows instructions](docs/windows.txt), and [portable Windows instructions](docs/windows-portable.txt).
+See the [verification record](docs/verification.md), [Mac instructions](macos/Read%20me.txt), [Windows instructions](docs/windows.txt), and [portable Windows instructions](docs/windows-portable.txt).
 
 ## Source layout
 
@@ -71,3 +71,4 @@ No recordings or transcripts are part of this repository or its releases. `.giti
 Whisper is pinned to the official b5454 / 1.9.5 release, and the model to a pinned Hugging Face revision with SHA-256 verification. Windows uses NAudio 2.2.1 and bundles .NET plus Microsoft's app-local C++ runtime. Mac uses Apple's system frameworks and the official Whisper Mac framework; Apple SDKs are not redistributed.
 
 Third-party license notices are in `licenses` and in the platform packages. No public license has been assigned to this private application's own source code.
+

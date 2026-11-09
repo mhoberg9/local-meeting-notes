@@ -1,60 +1,35 @@
-LOCAL MEETING NOTES — APPLE SILICON / macOS 15+
+LOCAL MEETING NOTES — macOS 15+ / APPLE SILICON
 
-STATUS
-This is a Mac build kit, not a precompiled or notarized Mac app. It was prepared in a Windows workspace without access to a Mac compiler or macOS audio devices. Swift syntax, shell-script syntax, bundle metadata, framework packaging and model checksums can be checked here; Apple SDK type checking, compilation, capture permissions, live audio and final signing must be verified on your Mac.
+RUN THE BUILT APP
+Download the Mac ZIP from this private repository's Releases page and move Local Meeting Notes.app to Applications before first opening it. The app contains its offline model, native Whisper helper and framework; running it needs no Xcode, account, transcription service or model download.
 
-The kit includes all app source, the native macOS Whisper framework and the approximately 190 MB offline speech model. No saved meetings, transcripts, Windows executables or reference audio samples are included.
+This preview is ad-hoc signed and not notarized. Follow your device's application policies. The first native Apple Silicon CI build passed compilation, signature verification, storage/recovery checks, generated two-hour audio handling and model initialization. A headless runner cannot verify your live microphone/system-audio capture or permission prompts.
 
-BUILD ON YOUR MAC
-1. Use an Apple Silicon Mac running macOS 15 or newer. Open a native Terminal, not a Rosetta Terminal.
-2. Install Xcode 16 or newer, or Apple Command Line Tools containing the macOS 15 SDK or newer. If the tools are missing, Apple's installer can be opened with: xcode-select --install
-3. Unzip this kit to a writable local folder. Keep Source, Models, Vendor, Tests and the other kit files together.
-4. Double-click Build.command, or run it from Terminal with: bash /path/to/Mac-Apple-Silicon/Build.command
-   You can type "bash " in Terminal, drag Build.command into the window, then press Return.
-5. The script checks model/framework hashes, compiles and runs the storage/recovery tests, builds the Apple Silicon app and helper, signs the bundle locally and checks that Whisper can initialize the bundled model.
-6. On success, dist/Local Meeting Notes.app and dist/LocalMeetingNotes-macOS-AppleSilicon.zip are created. Move the .app to Applications before first opening it.
-7. If the build fails, keep .build/build.log and share the error text so it can be fixed. A syntax check on Windows is not a substitute for a Mac build.
+FIRST RECORDING
+1. Open the app and choose German or English.
+2. Choose your microphone, Default Mac microphone, or Off.
+3. Click Start recording. Grant microphone and Screen & System Audio Recording access yourself when macOS asks; reopen the app if macOS requires it.
+4. Use headphones, play a short system-audio sample and speak a few words. Check both level meters.
+5. Press Stop and transcribe, then verify both sources appear in the transcript before relying on the app for a real meeting.
 
-Optional extended storage check: bash Build.command --long-tests
-This additionally generates and mixes two-hour synthetic audio tracks, checks duration and the final audio, and removes those generated long tracks. It temporarily needs roughly 700 MB extra disk space. It is not a two-hour live recording or full transcription test.
+Only audio outputs are registered for recording; the app does not save video or screenshots. System capture can include notifications and other system sounds. Speech transcription stays on the Mac. Metal acceleration is attempted on Apple Silicon, with CPU initialization as a fallback when possible.
 
-BUILD AND DISTRIBUTION
-The default signature is ad-hoc for local building/testing; no Apple Developer account is needed for that build. It is not notarized for public distribution. For a Developer ID signature, set SIGNING_IDENTITY to your own signing identity before running the script. Notarization and Gatekeeper acceptance on other Macs are separate steps and have not been performed. Do not disable macOS security settings to run this kit.
-
-Once built, the entire .app contains its model, helper and framework. Other Apple Silicon Macs with macOS 15+ do not need Xcode or separate model downloads to run the built app. Share the final dist ZIP, not your meeting-data folder. Respect any application policies on managed Macs.
-
-FIRST LIVE TEST
-Allow the app's microphone permission if you want your voice included. When macOS asks, also grant Screen & System Audio Recording access. Depending on the system, you may need to reopen the app after granting access. The app registers audio and microphone outputs only; it does not save video or screenshots. All system sounds on the selected capture filter, including notifications, can enter the recording.
-
-Choose German or English. Choose your microphone, Default Mac microphone, or Off. Use headphones to avoid recording loudspeaker playback again through the microphone. Record a short test with system playback and a few spoken words, press Stop and transcribe, and verify that both are present before relying on it for a real meeting.
-
-FEATURES AND LOCAL STORAGE
-The app records system audio plus an optional microphone, then transcribes after Stop. German and English are the only language choices. It uses the bundled multilingual small Q5_1 model and attempts Metal acceleration on Apple Silicon, falling back to CPU initialization when possible. An alternate compatible GGML .bin model can be chosen in the interface.
-
-The app does not upload audio, require an account or contact a transcription service. After the Mac has its build tools, building and running this kit require no dependency or model downloads.
-
-Your recordings and notes go to:
+FILES AND RECOVERY
+Recordings and notes are stored outside the app bundle:
 ~/Library/Application Support/LocalMeetingNotes/Meetings
-Use Open meeting folder to find them. They are outside the .app so moving or rebuilding the app does not intentionally remove them.
+Use Open meeting folder to find them. Moving or rebuilding the app does not intentionally remove that folder.
 
-Each recording may contain system.wav, microphone.wav, combined meeting.wav, transcript.txt, transcript.srt, transcription.log and status files. Pending transcription files and logs may contain text too. The interface shows the saved subtitle text, not an editable note document.
+Audio writes continuously to disk with requested checkpoints about every five seconds. The app asks the OS to stay awake, checks free space and stops after eight hours or when space is running low. Two hours with system and microphone audio uses approximately 690 MB across the source and mixed WAV files. Keep at least 1 GB free before recording, with extra space for longer meetings or recovery copies.
 
-LONG MEETINGS AND RECOVERY
-Audio writes continuously to disk, with a durable checkpoint requested about every five seconds. The app requests that macOS stay awake while recording and transcribing. It checks free space, reserves room for finalization, and stops after eight hours or when space is running low. Two hours with both audio sources needs approximately 690 MB across the three WAV files. Keep at least 1 GB free before starting, and more for recovery copies or longer meetings.
+Recover recording copies source tracks into a new folder, repairs stale WAV headers on those copies, mixes the tracks and transcribes. Originals remain unchanged; active recording locks prevent recovery while capture is still writing. Failed or cancelled transcription keeps the audio. Forced sleep, forced quit, device disconnects, power loss or storage damage can still lose recent or unavailable audio; no zero-loss guarantee is possible.
 
-Use Recover recording after an interrupted session. The app copies the original source tracks into a new meeting folder, repairs stale WAV headers on those copies, combines the tracks and transcribes. Originals stay unchanged. Cooperative file locks refuse recovery of a track still being recorded. Local builds include tests for this behavior, but they must actually pass on the Mac before the port is treated as verified.
+DELETION
+Audio is kept by default. Once complete, nonempty transcript and subtitle files have been saved, Delete audio offers permanent deletion of system.wav, microphone.wav and meeting.wav in the CURRENT folder after your confirmation. Text, subtitles, pending text and logs stay. Imported originals and original interrupted-recording folders stay. This cannot be undone and is not secure disk erasure.
 
-Cancelled or failed transcription keeps the audio. Ordinary Quit and window-close actions are blocked while an operation is active. Forced Quit, forced sleep, disconnects, power loss or damaged storage can still interrupt recording. There is no absolute zero-loss guarantee: recent uncheckpointed audio, gaps while asleep, or corrupted storage may be unavailable.
+BUILD FROM THE REPOSITORY
+Use an Apple Silicon Mac with macOS 15+ and Xcode 16+ or compatible Command Line Tools containing the macOS 15 SDK. From the repository root run:
+bash macos/Build.command --long-tests
 
-AUDIO DELETION
-Audio is kept by default. Delete audio is enabled only after a nonempty transcript, subtitle file and completion marker have been saved. After you confirm, it permanently removes system.wav, microphone.wav and meeting.wav in the CURRENT meeting folder. The text, subtitles, logs and pending text files stay. This cannot be undone and is not secure disk erasure. Imported originals and the original interrupted-recording folder are not removed.
+The first build fetches checksum-verified model and framework files. Subsequent builds can reuse them. The script runs storage/recovery checks, builds and signs the app, verifies the signature and initializes the bundled model. The generated app and distribution ZIP are in macos/dist. If compilation fails, inspect macos/.build/build.log.
 
-LIMITS
-The Mac port is not a Windows compatibility wrapper; capture and interface code were rewritten for macOS. It requires a visible, unlocked user session and an available display for the ScreenCaptureKit filter. Audio routing, Bluetooth devices, sleep and macOS permissions must be tested on the target Mac. No speaker-name identification, meeting summaries, translation or video recording are implemented. Transcription accuracy and speed vary with audio and hardware; review important wording.
-
-COMPONENTS
-whisper.cpp 1.9.5, pinned b5454 Apple framework:
-https://github.com/ggml-org/whisper.cpp/releases/tag/b5454
-Model:
-https://huggingface.co/ggerganov/whisper.cpp
-Framework and model license notices are included in Licenses. COMPONENTS.txt records their origin; COMPONENT-SHA256.txt verifies the supplied Mac framework archive and model.
+The build script defaults to local ad-hoc signing. You can provide your own SIGNING_IDENTITY for a Developer ID signature; notarization is a separate step. Apple SDKs are not redistributed. See the repository README and included third-party license notices for additional details.
